@@ -44,3 +44,18 @@ jobs:
       with:
         name: windows-binary
         path: target/release/ls-ygg-uuid-lookuper.exe
+
+  build-macos:
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install Rust
+      run: rustup update stable
+    - name: Build for MacOS
+      run: cargo build --release --verbose
+    - name: Upload MacOS Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: macos-binary
+        path: target/release/ls-ygg-uuid-lookuper
