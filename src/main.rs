@@ -47,7 +47,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             println!("UUID: {}", formatted_uuid);
             // This is not good enough, some one need to implement this piece of SH@T
         } else {
-            println!("Something wrong. I received: {}", item.id);
+            println!("Something wrong. Received: {}", item.id);
         }
     }
 
