@@ -28,12 +28,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // get response text
     let response_text = res.text()?;
-    println!("Response: {:?}", response_text);
+    println!("Response From LittleSkin Yggdrasil API: {:?}\n", response_text);
 
     // Prase JSON response
     let items: Vec<ResponseItem> = serde_json::from_str(&response_text)?;
 
-    // Regex to format UUID
+    // Regex format UUID
     let re = Regex::new(r"([a-fA-F0-9]{8})([a-fA-F0-9]{4})([a-fA-F0-9]{4})([a-fA-F0-9]{4})([a-fA-F0-9]{12})").unwrap();
 
     for item in items {
@@ -42,11 +42,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 "{}-{}-{}-{}-{}",
                 &caps[1], &caps[2], &caps[3], &caps[4], &caps[5]
             );
+            println!("Parsed Response");
             println!("Username: {}", item.name);
             println!("UUID: {}", formatted_uuid);
             // This is not good enough, some one need to implement this piece of SH@T
         } else {
-            println!("Invalid UUID format: {}", item.id);
+            println!("Something wrong. I received: {}", item.id);
         }
     }
 
