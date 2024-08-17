@@ -9,6 +9,7 @@ on:
     branches: [ "master" ]
     paths:
       - "src/main.rs"
+      - Cargo.toml
 
 env:
   CARGO_TERM_COLOR: always
