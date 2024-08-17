@@ -44,6 +44,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             );
             println!("Username: {}", item.name);
             println!("UUID: {}", formatted_uuid);
+            // This is not good enough, some one need to implement this piece of SH@T
         } else {
             println!("Invalid UUID format: {}", item.id);
         }
