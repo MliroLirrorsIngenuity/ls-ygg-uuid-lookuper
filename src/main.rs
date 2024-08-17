@@ -22,4 +22,3 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Response: {:?}", res.text()?);
     Ok(())
 }
-
