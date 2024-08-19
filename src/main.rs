@@ -54,10 +54,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     println!("Wait, trying to get UUID from Mojang API...\n");
 
-    // Send POST request to Mojang
-    let res = client.post("https://authserver.mojang.com/api/profiles/minecraft")
-        .json(&body)
-        .send()?;
+    // Sent GET request to Mojang (weird, but they using GET for this. POST also works but I'm lazy)
+    let mojang_url = format!("https://api.mojang.com/users/profiles/minecraft/{}", input);
+    let res = client.get(&mojang_url).send()?;
 
     // Get response from Mojang
     let response_text = res.text()?;
