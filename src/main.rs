@@ -65,18 +65,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Parse JSON response from Mojang
     let items: Vec<ResponseItem> = serde_json::from_str(&response_text)?;
 
-    for item in items {
-        if let Some(caps) = re.captures(&item.id) {
-            let formatted_uuid = format!(
-                "{}-{}-{}-{}-{}",
-                &caps[1], &caps[2], &caps[3], &caps[4], &caps[5]
-            );
-            println!("Parsed Response from Mojang");
-            println!("Username: {}", item.name);
-            println!("UUID: {}", formatted_uuid);
-        } else {
-            println!("Something wrong. Received: {}", item.id);
-        }
+    if let Some(caps) = re.captures(&item.id) {
+        let formatted_uuid = format!(
+            "{}-{}-{}-{}-{}",
+            &caps[1], &caps[2], &caps[3], &caps[4], &caps[5]
+        );
+        println!("Parsed Response from Mojang");
+        println!("Username: {}", item.name);
+        println!("UUID: {}", formatted_uuid);
+    } else {
+        println!("Something wrong. Received: {}", item.id);
     }
 
     Ok(())
