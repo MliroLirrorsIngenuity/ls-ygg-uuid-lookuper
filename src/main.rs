@@ -63,7 +63,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Response From Mojang API: {:?}\n", response_text);
 
     // Parse JSON response from Mojang
-    let items: Vec<ResponseItem> = serde_json::from_str(&response_text)?;
+    let re = Regex::new(r"([a-fA-F0-9]{8})([a-fA-F0-9]{4})([a-fA-F0-9]{4})([a-fA-F0-9]{4})([a-fA-F0-9]{12})").unwrap();
 
     if let Some(caps) = re.captures(&item.id) {
         let formatted_uuid = format!(
