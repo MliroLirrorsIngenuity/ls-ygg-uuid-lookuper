@@ -29,16 +29,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .send()?;
 
     // Get response from LittleSkin
-    let response_text = res.text()?;
-    println!("Response From LittleSkin Yggdrasil API: {:?}\n", response_text);
+    let response_text_littleskin = res.text()?;
+    println!("Response From LittleSkin Yggdrasil API: {:?}\n", response_text_littleskin);
 
     // Parse JSON response from LittleSkin
-    let items: Vec<ResponseItem> = serde_json::from_str(&response_text)?;
+    let items: Vec<ResponseItem> = serde_json::from_str(&response_text_littleskin)?;
 
     // Use regex to format UUID
     let re = Regex::new(r"([a-fA-F0-9]{8})([a-fA-F0-9]{4})([a-fA-F0-9]{4})([a-fA-F0-9]{4})([a-fA-F0-9]{12})").unwrap();
 
-    for item in items {
+    for item in &items {
         if let Some(caps) = re.captures(&item.id) {
             let formatted_uuid = format!(
                 "{}-{}-{}-{}-{}",
@@ -59,22 +59,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let res = client.get(&mojang_url).send()?;
 
     // Get response from Mojang
-    let response_text = res.text()?;
-    println!("Response From Mojang API: {:?}\n", response_text);
+    let response_text_mojang = res.text()?;
+    println!("Response From Mojang API: {:?}\n", response_text_mojang);
 
     // Parse JSON response from Mojang
-    let re = Regex::new(r"([a-fA-F0-9]{8})([a-fA-F0-9]{4})([a-fA-F0-9]{4})([a-fA-F0-9]{4})([a-fA-F0-9]{12})").unwrap();
-
-    if let Some(caps) = re.captures(&item.id) {
-        let formatted_uuid = format!(
+    if let Some(caps) = re.captures(&items[0].id) {
+        let formatted_uuid_mojang = format!(
             "{}-{}-{}-{}-{}",
             &caps[1], &caps[2], &caps[3], &caps[4], &caps[5]
         );
         println!("Parsed Response from Mojang");
-        println!("Username: {}", item.name);
-        println!("UUID: {}", formatted_uuid);
+        println!("Username: {}", items[0].name);
+        println!("UUID: {}", formatted_uuid_mojang);
     } else {
-        println!("Something wrong. Received: {}", item.id);
+        println!("Something wrong. Received: {}", items[0].id);
     }
 
     Ok(())
