@@ -1,7 +1,7 @@
 use reqwest::blocking::Client;
-use std::io;
 use serde_json::json;
 use serde::Deserialize;
+use std::io;
 use regex::Regex;
 
 #[derive(Deserialize, Debug)]
@@ -19,61 +19,81 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // make a json request body
     let body = json!([input]);
-
+    
     // create a HTTP client and send a POST request
     let client = Client::new();
-
+    
     // Send POST request to LittleSkin
     let res = client.post("https://littleskin.cn/api/yggdrasil/api/profiles/minecraft")
         .json(&body)
         .send()?;
-
+    
     // Get response from LittleSkin
     let response_text_littleskin = res.text()?;
     println!("Response From LittleSkin Yggdrasil API: {:?}\n", response_text_littleskin);
-
+    
     // Parse JSON response from LittleSkin
-    let items: Vec<ResponseItem> = serde_json::from_str(&response_text_littleskin)?;
-
+    let items: Option<Vec<ResponseItem>> = serde_json::from_str(&response_text_littleskin).ok();
+    
     // Use regex to format UUID
     let re = Regex::new(r"([a-fA-F0-9]{8})([a-fA-F0-9]{4})([a-fA-F0-9]{4})([a-fA-F0-9]{4})([a-fA-F0-9]{12})").unwrap();
-
-    for item in &items {
-        if let Some(caps) = re.captures(&item.id) {
-            let formatted_uuid = format!(
-                "{}-{}-{}-{}-{}",
-                &caps[1], &caps[2], &caps[3], &caps[4], &caps[5]
-            );
-            println!("Parsed Response from LittleSkin");
-            println!("Username: {}", item.name);
-            println!("UUID: {}", formatted_uuid);
-        } else {
-            println!("Something wrong. Received: {}\n", item.id);
+    
+    let mut formatted_uuid_littleskin = String::new();
+    let mut username = String::new();
+    
+    if let Some(items) = items {
+        if let Some(first_item) = items.first() {
+            username = first_item.name.clone();
+        }
+        
+        for item in &items {
+            if let Some(caps) = re.captures(&item.id) {
+                formatted_uuid_littleskin = format!(
+                    "{}-{}-{}-{}-{}",
+                    &caps[1], &caps[2], &caps[3], &caps[4], &caps[5]
+                );
+            } else {
+                println!("Something wrong. Received: {}\n", item.id);
+            }
         }
     }
-
+    
     println!("Wait, trying to get UUID from Mojang API...\n");
-
+    
     // Sent GET request to Mojang (weird, but they using GET for this. POST also works but I'm lazy)
     let mojang_url = format!("https://api.mojang.com/users/profiles/minecraft/{}", input);
     let res = client.get(&mojang_url).send()?;
-
+    
     // Get response from Mojang
     let response_text_mojang = res.text()?;
     println!("Response From Mojang API: {:?}\n", response_text_mojang);
-
+    
     // Parse JSON response from Mojang
-    if let Some(caps) = re.captures(&items[0].id) {
-        let formatted_uuid_mojang = format!(
-            "{}-{}-{}-{}-{}",
-            &caps[1], &caps[2], &caps[3], &caps[4], &caps[5]
-        );
-        println!("Parsed Response from Mojang");
-        println!("Username: {}", items[0].name);
-        println!("UUID: {}", formatted_uuid_mojang);
-    } else {
-        println!("Something wrong. Received: {}", items[0].id);
+    let item: Option<ResponseItem> = serde_json::from_str(&response_text_mojang).ok();
+    
+    let mut formatted_uuid_mojang = String::new();
+    
+    if let Some(item) = item {
+        if let Some(caps) = re.captures(&item.id) {
+            formatted_uuid_mojang = format!(
+                "{}-{}-{}-{}-{}",
+                &caps[1], &caps[2], &caps[3], &caps[4], &caps[5]
+            );
+        } else {
+            println!("Something wrong. Received: {}", item.id);
+        }
     }
-
+    
+    // Print the result
+    if !username.is_empty() {
+        println!("Username: {}", username);
+    }
+    if !formatted_uuid_littleskin.is_empty() {
+        println!("LittleSkin Ygg UUID: {}", formatted_uuid_littleskin);
+    }
+    if !formatted_uuid_mojang.is_empty() {
+        println!("Mojang Ygg UUID: {}", formatted_uuid_mojang);
+    }
+    
     Ok(())
 }
