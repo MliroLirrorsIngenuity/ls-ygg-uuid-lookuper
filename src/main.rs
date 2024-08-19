@@ -84,15 +84,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     }
     
-    // Print the result
-    if !username.is_empty() {
-        println!("Username: {}", username);
-    }
-    if !formatted_uuid_littleskin.is_empty() {
-        println!("LittleSkin Ygg UUID: {}", formatted_uuid_littleskin);
-    }
-    if !formatted_uuid_mojang.is_empty() {
-        println!("Mojang Ygg UUID: {}", formatted_uuid_mojang);
+    // Check if both LittleSkin and Mojang data are not found
+    if username.is_empty() && formatted_uuid_littleskin.is_empty() && formatted_uuid_mojang.is_empty() {
+        println!("Not Found");
+    } else {
+        // Print the result
+        if !username.is_empty() {
+            println!("Username: {}", username);
+        }
+        if !formatted_uuid_littleskin.is_empty() {
+            println!("LittleSkin Ygg UUID: {}", formatted_uuid_littleskin);
+        }
+        if !formatted_uuid_mojang.is_empty() {
+            println!("Mojang Ygg UUID: {}", formatted_uuid_mojang);
+        }
     }
     
     Ok(())
