@@ -1,8 +1,9 @@
-use reqwest::blocking::Client;
+use reqwest::Client;
 use serde_json::json;
 use serde::Deserialize;
 use std::io;
 use regex::Regex;
+use tokio;
 
 #[derive(Deserialize, Debug)]
 struct ResponseItem {
@@ -10,7 +11,8 @@ struct ResponseItem {
     name: String,
 }
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // get username from user input
     let mut input = String::new();
     println!("Username:");
@@ -26,10 +28,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Send POST request to LittleSkin
     let res = client.post("https://littleskin.cn/api/yggdrasil/api/profiles/minecraft")
         .json(&body)
-        .send()?;
+        .send()
+        .await?;
 
     // Get response from LittleSkin
-    let response_text_littleskin = res.text()?;
+    let response_text_littleskin = res.text().await?;
     println!("Response From LittleSkin Yggdrasil API: {:?}\n", response_text_littleskin);
 
     // Parse JSON response from LittleSkin
@@ -62,10 +65,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Sent GET request to Mojang (weird, but they using GET for this. POST also works but I'm lazy)
     let mojang_url = format!("https://api.mojang.com/users/profiles/minecraft/{}", input);
-    let res = client.get(&mojang_url).send()?;
+    let res = client.get(&mojang_url).send().await?;
 
     // Get response from Mojang
-    let response_text_mojang = res.text()?;
+    let response_text_mojang = res.text().await?;
     println!("Response From Mojang API: {:?}\n", response_text_mojang);
 
     // Parse JSON response from Mojang
