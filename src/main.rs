@@ -61,8 +61,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     }
 
-    println!("Wait, trying to get UUID from Mojang API...\n");
-
     // Sent GET request to Mojang (weird, but they using GET for this. POST also works but I'm lazy)
     let mojang_url = format!("https://api.mojang.com/users/profiles/minecraft/{}", input);
     let res = client.get(&mojang_url).send().await?;
